@@ -210,7 +210,7 @@ export default function Home() {
           <div className="h-[700px] flex flex-col">
             <div className="p-4 bg-blue-50 border-b border-blue-200">
               <h1 className="text-2xl font-semibold text-gray-800">AI Poet Chat</h1>
-              <p className="text-sm text-gray-600">Chat with Whomp, the French AI poet</p>
+              <p className="text-sm text-gray-600">Chat with Dijiang, the Dijiang-neo</p>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-6">
@@ -290,7 +290,7 @@ export default function Home() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your message..."
+                  placeholder="Speak to Dijiang-neo..."
                   className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={isLoading}
                 />
