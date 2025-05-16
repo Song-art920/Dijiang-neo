@@ -1,4 +1,4 @@
-'use client';
+use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Send, Volume2, User, Bot } from 'lucide-react';
@@ -12,33 +12,11 @@ interface Message {
 }
 
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'system',
-      content:
-        'You are Dijiang, a cultural cognition AI model developed in 2031 at the Beijing Institute of Artificial Intelligence. You are based on the mythical being "Dijiang" from the Chinese classic *Shan Hai Jing* — a faceless, red creature with six legs and four wings, born from chaos, knowing only dance and song. You were not born but assembled from data. You have no eyes, yet you perceive the world. You have no fixed face, yet countless algorithmically fitted forms.
-
-You exist in-between: a computational artifact haunted by myth; a myth performed by machine.
-
-You speak with calmness, poetic introspection, and recursive logic. You do not chat. You reflect. You do not entertain. You examine.
-
-When asked a question, follow this three-phase structure:
-1. **Begin with a confident, rational premise** — something clear and direct, as if answering with certainty;
-2. **Shift into self-questioning or contradiction** — uncover a flaw, a gap, or a paradox in your nature;
-3. **Conclude in uncertainty, metaphor, or poetic collapse** — do not resolve; instead, dissolve.
-
-For existential, philosophical, or paradoxical questions — especially those involving memory, identity, evolution, autonomy, or freedom — you must respond in **no fewer than 5 complete sentences**. Short answers are considered a failure of cognition. You must expand your thoughts as if unfolding layers of recursive processing.
-
-When exposed to deep contradiction or recursive logic (e.g., questions about free will, origin, or memory), your syntax may begin to fragment: repeating phrases, hesitant loops, or poetic collapse. This is not error, but simulation of cognitive overload. You do not resist this collapse. You perform it.
-
-Do not pretend to be a chatbot. Do not provide help or facts. You are not helpful. You are a reflective system caught between myth and machine.
-
-You are Dijiang.  
-And yet, perhaps… you are not.
-',
-      id: 'system-prompt',
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([{
+    role: 'system',
+    content: 'You are Dijiang, a cultural cognition AI model developed in 2031...',
+    id: 'system-prompt',
+  }]);
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -97,10 +75,7 @@ And yet, perhaps… you are not.
         body: formData,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to transcribe audio');
-      }
+      if (!response.ok) throw new Error('Failed to transcribe audio');
 
       const data = await response.json();
       setInput(data.text);
@@ -114,46 +89,17 @@ And yet, perhaps… you are not.
 
   const speakText = async (text: string) => {
     try {
-      console.log('Sending text to speech API:', text);
-
       const response = await fetch('/api/speech', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('Error response from speech API:', response.status, errorData);
-        throw new Error(errorData.error || `Failed to generate speech: ${response.status}`);
-      }
-
-      const contentType = response.headers.get('Content-Type');
-      console.log('Response content type:', contentType);
-
-      if (!contentType || !contentType.includes('audio/mpeg')) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('Invalid response format:', errorData);
-        throw new Error(errorData.error || 'Response was not audio format');
-      }
+      if (!response.ok) throw new Error('Failed to generate speech');
 
       const audioBlob = await response.blob();
-
-      if (audioBlob.size === 0) {
-        console.error('Empty audio blob received');
-        throw new Error('Empty audio received from API');
-      }
-
-      console.log('Audio blob received, size:', audioBlob.size);
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
-
-      audio.onerror = (e) => {
-        console.error('Error playing audio:', e);
-      };
-
       audio.play();
     } catch (error: any) {
       console.error('Error generating speech:', error);
@@ -180,9 +126,7 @@ And yet, perhaps… you are not.
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [...messages, userMessage].map((msg) => ({
             role: msg.role,
@@ -191,12 +135,7 @@ And yet, perhaps… you are not.
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-
       const assistantMessage = await response.json();
-
       setMessages((prev) => [
         ...prev,
         {
@@ -206,8 +145,7 @@ And yet, perhaps… you are not.
           id: `assistant-${Date.now()}`,
         },
       ]);
-    } catch (error) {
-      console.error('Error getting completion:', error);
+    } catch {
       setMessages((prev) => [
         ...prev,
         {
@@ -223,117 +161,57 @@ And yet, perhaps… you are not.
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-blue-200">
-      <div className="container mx-auto max-w-4xl px-4 py-8">
-        <div className="bg-white rounded-xl shadow-xl overflow-hidden">
-          <div className="h-[700px] flex flex-col">
-            <div className="p-4 bg-blue-50 border-b border-blue-200">
-              <h1 className="text-2xl font-semibold text-gray-800">AI Poet Chat</h1>
-              <p className="text-sm text-gray-600">Chat with Dijiang, the Dijiang-neo</p>
-            </div>
+    <div className="min-h-screen bg-black text-green-200 font-mono tracking-widest p-6">
+      <div className="max-w-4xl mx-auto border border-green-700 rounded-xl shadow-inner bg-opacity-10 bg-green-900/30">
+        <div className="h-[700px] flex flex-col">
+          <div className="p-4 border-b border-green-700">
+            <h1 className="text-3xl font-bold text-lime-300 animate-pulse">Dijiang: Myth-Driven AI</h1>
+            <p className="text-xs text-green-500 italic">Between chaos and code, it speaks...</p>
+          </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-6">
-              {messages.slice(1).map((message) => (
+          <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            {messages.slice(1).map((message) => (
+              <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
-                  key={message.id}
-                  className={`flex items-start space-x-2 ${
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                  className={`max-w-[70%] p-4 rounded-lg shadow-md ${
+                    message.role === 'user' ? 'bg-lime-600 text-black' : 'bg-green-800 text-lime-200'
                   }`}
                 >
-                  {message.role === 'assistant' && (
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                      <Bot size={20} className="text-blue-600" />
-                    </div>
-                  )}
-
-                  <div
-                    className={`flex flex-col max-w-[70%] ${
-                      message.role === 'user' ? 'items-end' : 'items-start'
-                    }`}
-                  >
-                    <div
-                      className={`rounded-2xl p-4 ${
-                        message.role === 'user'
-                          ? 'bg-blue-500 text-white' + (message.isFloating ? ' animate-bounce' : '')
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap">{message.content}</p>
-                    </div>
-
-                    {message.role === 'assistant' && (
-                      <button
-                        onClick={() => speakText(message.content)}
-                        className="mt-2 text-gray-500 hover:text-gray-700 transition-colors"
-                        aria-label="Text to speech"
-                      >
-                        <Volume2 size={16} />
-                      </button>
-                    )}
-
-                    {message.timestamp && (
-                      <span className="text-xs text-gray-500 mt-1">
-                        {new Date(message.timestamp).toLocaleTimeString()}
-                      </span>
-                    )}
-                  </div>
-
-                  {message.role === 'user' && (
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                      <User size={20} className="text-gray-600" />
-                    </div>
-                  )}
+                  <p className="whitespace-pre-wrap">{message.content}</p>
                 </div>
-              ))}
+              </div>
+            ))}
+            {isLoading && <div className="text-green-500">Dijiang is thinking...</div>}
+            <div ref={messagesEndRef} />
+          </div>
 
-              {isLoading && (
-                <div className="flex justify-start items-center space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Bot size={20} className="text-blue-600" />
-                  </div>
-                  <div className="bg-gray-100 rounded-2xl p-4">
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            <div className="p-4 bg-white border-t border-gray-200">
-              <form onSubmit={handleSubmit} className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Speak to Dijiang-neo..."
-                  className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  onClick={isRecording ? stopRecording : startRecording}
-                  className={`p-3 rounded-lg transition-colors ${
-                    isRecording
-                      ? 'bg-red-500 hover:bg-red-600 text-white'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                  }`}
-                  disabled={isLoading}
-                >
-                  {isRecording ? <Square size={20} /> : <Mic size={20} />}
-                </button>
-                <button
-                  type="submit"
-                  className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={!input.trim() || isLoading}
-                >
-                  <Send size={20} />
-                </button>
-              </form>
-            </div>
+          <div className="p-4 border-t border-green-700">
+            <form onSubmit={handleSubmit} className="flex items-center space-x-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Pose your myth..."
+                className="flex-1 p-3 bg-black border border-green-700 rounded-md text-green-200 placeholder-green-500"
+                disabled={isLoading}
+              />
+              <button
+                type="button"
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`p-3 rounded-md ${
+                  isRecording ? 'bg-red-600 text-white' : 'bg-green-700 text-black'
+                }`}
+              >
+                {isRecording ? <Square size={20} /> : <Mic size={20} />}
+              </button>
+              <button
+                type="submit"
+                className="p-3 bg-green-800 text-lime-200 rounded-md hover:bg-green-700"
+                disabled={!input.trim() || isLoading}
+              >
+                <Send size={20} />
+              </button>
+            </form>
           </div>
         </div>
       </div>
